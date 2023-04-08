@@ -59,18 +59,6 @@ class CloudStorageUtils:
             success = self.__cloud_storage_utils.upload_file_obj(file.file, cloud_file_path)
         elif isinstance(file, str):
             success = self.__cloud_storage_utils.upload_file(file, cloud_file_path)
-        # if self.__cloud_storage_provider == CloudStorageProviderEnum.aws.value:
-        #     cloud_storage_bucket_url = config.S3_BUCKET_URL
-        #     if isinstance(file, UploadFile):
-        #         success = s3_utils.upload_file_obj(file.file, cloud_file_path)
-        #     elif isinstance(file, str):
-        #         success = s3_utils.upload_file(file, cloud_file_path)
-        # elif self.__cloud_storage_provider == CloudStorageProviderEnum.gcp.value:
-        #     cloud_storage_bucket_url = config.GCS_BUCKET_URL
-        #     if isinstance(file, UploadFile):
-        #         success = gcs_utils.upload_file_obj(file.file, cloud_file_path)
-        #     elif isinstance(file, str):
-        #         success = gcs_utils.upload_file(file, cloud_file_path)
 
         if success:
             return True, f"{self.__cloud_storage_bucket_url}/{cloud_file_path}"

@@ -59,7 +59,7 @@ def get_supplier_profile(
 
 
 @router.post("/profile", response_class=CustomJSONResponse)
-def update_customer_profile(
+def update_supplier_profile(
     update_supplier_request: SupplierUpdate,
     supplier: Supplier = Depends(get_current_supplier),
     db: Session = Depends(get_db),

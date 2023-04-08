@@ -83,5 +83,7 @@ class AppConfig(BaseSettings):
     EMAIL_PASSWORD: str = ""
     EMAIL_SERVICE_PROVIDER: str = "ses"
 
+    EMAIL_RESET_TOKEN_EXPIRE_MINUTES: int = 15
+
 
 config = AppConfig()

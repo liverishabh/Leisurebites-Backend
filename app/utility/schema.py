@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
 
     @validator("phone_no")
     @classmethod
-    def validate_sku_id(cls, v: Any) -> str:
+    def validate_phone_no(cls, v: Any) -> str:
         rgx = re.compile("^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]" "*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$")
         if re.match(rgx, v) is None:
             raise ValueError(f"Phone Number is invalid")

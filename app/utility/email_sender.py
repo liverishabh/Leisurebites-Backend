@@ -48,8 +48,8 @@ class EmailSender:
         email_message['To'] = ", ".join(destination_emails)
         email_message['Subject'] = email_subject
 
-        body_template = Environment(loader=BaseLoader).from_string(email_body)  # type: ignore
-        body = body_template.render(**environment)
+        body = Environment(loader=BaseLoader).from_string(email_body)  # type: ignore
+        body = body.render(**environment or {})
         email_message.attach(MIMEText(body, "html"))
 
         if attachment_file_path:

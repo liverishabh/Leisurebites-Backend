@@ -77,7 +77,8 @@ class Experience(BaseModel):
     )
 
     slots = relationship(
-        "ExperienceSlot", lazy="select",
+        "ExperienceSlot", order_by=ExperienceSlot.start_time, lazy="select",
         primaryjoin="and_(Experience.id == ExperienceSlot.experience_id, "
-                    "ExperienceSlot.is_active == 'true')",
+                    "ExperienceSlot.is_active == 'true', "
+                    "ExperienceSlot.start_time >= func.now())",
     )

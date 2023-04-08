@@ -1,4 +1,4 @@
-## Task Manger Application
+## Leisurebites Backend Application
 
 Guidelines to run application:
 ```shell
