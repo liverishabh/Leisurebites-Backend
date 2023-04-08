@@ -18,7 +18,8 @@ class SESUtils:
         self.__client = boto3.client(
             service_name="ses",
             aws_access_key_id=config.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY
+            aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
+            region_name="ap-south-1"
         )
 
     def send_email(
