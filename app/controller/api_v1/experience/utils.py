@@ -8,7 +8,6 @@ def validate_new_slot(
     existing_slots
 ):
     if start_time < datetime.now(tz=pytz.utc):
-        print("Start Time Less than now")
         return False
 
     low = 0

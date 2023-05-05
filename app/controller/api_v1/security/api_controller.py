@@ -18,7 +18,8 @@ from app.controller.api_v1.security.utils import (
     get_password_reset_token_from_redis,
     get_password_hash,
     delete_password_reset_token_from_redis,
-    delete_login_tokens_from_redis, logout_user
+    delete_login_tokens_from_redis,
+    logout_user
 )
 from app.dependencies.db import get_db
 from app.dependencies.logger import ApplicationLogger

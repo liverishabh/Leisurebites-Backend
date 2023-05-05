@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, BIGINT, INT, TEXT, Enum, String, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, BIGINT, INT, TEXT, NUMERIC, Enum, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import true, false, text
 
@@ -51,7 +51,7 @@ class Experience(BaseModel):
     mode = Column(Enum(ExperienceMode), nullable=False)
     min_age = Column(INT, nullable=False)
     guest_limit = Column(INT, nullable=False)
-    price_per_guest = Column(INT, nullable=False)
+    price_per_guest = Column(NUMERIC(10, 2), nullable=False)
     venue_address = Column(TEXT)
     venue_city = Column(String(50))
     venue_state = Column(String(50))

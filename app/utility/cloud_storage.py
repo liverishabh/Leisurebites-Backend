@@ -11,7 +11,7 @@ from app.config import config
 from app.dependencies.s3 import s3_utils
 
 
-class CloudStorageProviderEnum(str, enum.Enum):
+class CloudStorageProvider(str, enum.Enum):
     aws = "aws"
     gcp = "gcp"
 
@@ -36,7 +36,7 @@ class CloudStorageUtils:
         self.__cloud_storage_provider = config.CLOUD_STORAGE_PROVIDER
         self.__cloud_storage_utils = None
         self.__cloud_storage_bucket_url = None
-        if self.__cloud_storage_provider == CloudStorageProviderEnum.aws.value:
+        if self.__cloud_storage_provider == CloudStorageProvider.aws.value:
             self.__cloud_storage_utils = s3_utils
             self.__cloud_storage_bucket_url = config.S3_BUCKET_URL
         # elif self.__cloud_storage_provider == CloudStorageProviderEnum.gcp.value:

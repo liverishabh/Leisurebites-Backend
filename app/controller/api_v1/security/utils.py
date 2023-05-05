@@ -133,7 +133,12 @@ def delete_login_tokens_from_redis(pattern: str) -> None:
         redis_client.delete(key)
 
 
-def send_reset_password_email(destination_email: str, user_name: str, token: str, redirect_url: str) -> None:
+def send_reset_password_email(
+    destination_email: str,
+    user_name: str,
+    token: str,
+    redirect_url: str
+) -> None:
     subject = "Password Reset requested"
     with open(EMAIL_TEMPLATES_DIR + "/reset_password.html") as f:
         template_str = f.read()

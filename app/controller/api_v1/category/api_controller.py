@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session
 from app.controller.api_v1.category.schema import Category as CategoryResponse
 from app.dependencies.db import get_db
 from app.models.category import Category
+from app.utility.response import CustomJSONResponse
 from app.utility.router import RequestResponseLoggingRoute
 
 router = APIRouter(route_class=RequestResponseLoggingRoute)
 
 
-@router.get("/categories")
+@router.get("/categories", response_class=CustomJSONResponse)
 def get_categories(
     db: Session = Depends(get_db),
 ) -> Any:

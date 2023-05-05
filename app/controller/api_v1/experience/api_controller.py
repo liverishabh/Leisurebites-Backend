@@ -20,7 +20,7 @@ from app.utility.router import RequestResponseLoggingRoute
 router = APIRouter(route_class=RequestResponseLoggingRoute)
 
 
-@router.get("/popular")
+@router.get("/popular", response_class=CustomJSONResponse)
 def get_popular_experiences(
     db: Session = Depends(get_db),
 ) -> Any:
@@ -28,7 +28,7 @@ def get_popular_experiences(
     pass
 
 
-@router.get("/similar")
+@router.get("/similar", response_class=CustomJSONResponse)
 def get_similar_experiences(
     experience_id: int = Query(...),
     db: Session = Depends(get_db),
@@ -37,7 +37,7 @@ def get_similar_experiences(
     pass
 
 
-@router.get("")
+@router.get("", response_class=CustomJSONResponse)
 def get_experience_by_id(
     experience_id: int = Query(...),
     db: Session = Depends(get_db),
@@ -67,7 +67,7 @@ def get_experience_by_id(
     )
 
 
-@router.post("/category/all")
+@router.post("/category/all", response_class=CustomJSONResponse)
 def get_experiences_by_category(
 
     category_id: int = Query(...),

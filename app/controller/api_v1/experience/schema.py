@@ -7,6 +7,7 @@ from app.models.experience import ExperienceMode
 
 
 class ExperienceSlot(BaseModel):
+    id: int
     start_time: datetime
     end_time: datetime
     is_booked: bool
@@ -43,7 +44,7 @@ class ExperienceCreate(BaseModel):
     mode: ExperienceMode
     min_age: int = Field(..., gt=0)
     guest_limit: int = Field(..., gt=0)
-    price_per_guest: int = Field(..., gt=0)
+    price_per_guest: float = Field(..., gt=0)
     venue_address: Optional[str] = Field(None, min_length=1)
     venue_city: Optional[str] = Field(None, min_length=1)
     venue_state: Optional[str] = Field(None, min_length=1)
