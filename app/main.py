@@ -3,6 +3,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
 # from fastapi.testclient import TestClient
 
 from asgi_correlation_id import CorrelationIdMiddleware, correlation_id
@@ -16,6 +18,13 @@ logger = ApplicationLogger.get_logger(__name__)
 app = FastAPI(title=config.PROJECT_NAME, docs_url=f"{config.API_V1_PREFIX}/docs")
 app.add_middleware(CorrelationIdMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=config.MINIMUM_SIZE_FOR_COMPRESSION)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[str(origin) for origin in config.BACKEND_CORS_ORIGINS],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.exception_handler(StarletteHTTPException)

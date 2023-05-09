@@ -1,11 +1,12 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
-from pydantic import BaseSettings, AnyUrl, validator, PostgresDsn
+from pydantic import BaseSettings, AnyUrl, validator, PostgresDsn, AnyHttpUrl
 
 
 class AppConfig(BaseSettings):
     PROJECT_NAME: str = "LeisureBites Backend"
     API_V1_PREFIX: str = "/api/v1"
+    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     SECRET_KEY: str
 
     POSTGRES_SERVER: str = "localhost"
