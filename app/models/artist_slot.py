@@ -1,4 +1,5 @@
 from sqlalchemy import Column, INT, NUMERIC, TEXT, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import true, false, text
 
 from app.models import BaseModel
@@ -20,3 +21,6 @@ class ArtistSlot(BaseModel):
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
     updated_time = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"), nullable=False)
 
+    artist = relationship(
+        "Supplier", lazy="select", uselist=False
+    )

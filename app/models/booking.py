@@ -1,6 +1,7 @@
 import enum
 
 from sqlalchemy import Column, BIGINT, INT, NUMERIC, String, Enum, DateTime, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 
 from app.models import BaseModel
@@ -50,3 +51,10 @@ class Booking(BaseModel):
 
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
     updated_time = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"), nullable=False)
+
+    experience_slot = relationship(
+        "ExperienceSlot", lazy="select", uselist=False
+    )
+    artist_slot = relationship(
+        "ArtistSlot", lazy="select", uselist=False
+    )

@@ -1,14 +1,15 @@
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.controller.api_v1.customer.schema import Customer as CustomerResponse, CustomerUpdate
+from app.controller.api_v1.customer.schema import Customer as CustomerResponse, CustomerUpdate, CustomerBooking
 from app.controller.api_v1.security.utils import get_password_hash
 from app.dependencies.db import get_db
 from app.dependencies.logger import ApplicationLogger
+from app.models.booking import Booking, BookingType
 from app.models.customer import Customer
 from app.utility.auth import get_current_customer
 from app.utility.response import CustomJSONResponse
@@ -72,3 +73,38 @@ def update_customer_profile(
 
     db.commit()
     return "Customer Profile updated successfully"
+
+
+@router.get("/bookings", response_class=CustomJSONResponse)
+def get_customer_bookings(
+    customer: Customer = Depends(get_current_customer),
+    db: Session = Depends(get_db),
+) -> Any:
+    """ Get Customer Bookings """
+    bookings: List[Booking] = db.query(Booking).filter(
+        Booking.customer_id == customer.id
+    ).all()
+
+    bookings_resp = []
+    for booking in bookings:
+        if booking.booking_type == BookingType.artist:
+            slot = booking.artist_slot
+            title = slot.artist.name
+            venue = slot.venue_address
+        else:
+            slot = booking.experience_slot
+            experience = slot.experience
+            title = experience.title
+            venue = experience.venue_address
+        bookings_resp.append(
+            CustomerBooking(
+                **booking.__dict__,
+                title=title,
+                venue=venue,
+                slot_start_time=slot.start_time,
+                slot_end_time=slot.end_time,
+                booking_time=booking.confirmation_time
+            )
+        )
+
+    return bookings_resp

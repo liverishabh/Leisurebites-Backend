@@ -33,11 +33,15 @@ class ExperienceSlot(BaseModel):
     experience_id = Column(INT, ForeignKey("experience.id"), nullable=False)
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
-    is_booked = Column(Boolean(), server_default=false(), nullable=False)
+    remaining_guest_limit = Column(INT, nullable=False)
     is_active = Column(Boolean(), server_default=true(), nullable=False)
 
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
     updated_time = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"), nullable=False)
+
+    experience = relationship(
+        "Experience", lazy="select", uselist=False
+    )
 
 
 class Experience(BaseModel):

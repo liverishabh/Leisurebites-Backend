@@ -217,6 +217,7 @@ def add_slot(
     slot.experience_id = experience_id
     slot.start_time = add_slot_request.start_time
     slot.end_time = add_slot_request.end_time
+    slot.remaining_guest_limit = experience.guest_limit
 
     db.add(slot)
     db.commit()

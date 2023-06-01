@@ -11,7 +11,8 @@ from app.controller.api_v1.booking.utils import (
     initiate_artist_booking,
     update_artist_slot_address,
     handle_booking_confirmation,
-    handle_artist_booking_approval
+    handle_artist_booking_approval,
+    handle_artist_booking_payment_initiation
 )
 from app.dependencies.db import get_db
 from app.models.booking import Booking, BookingType, BookingStatus
@@ -102,6 +103,42 @@ def approve_artist_booking(
     )
 
     return "Booking Approved"
+
+
+@router.post("/artist/initiate-payment/{booking_id}", response_class=CustomJSONResponse)
+def approve_artist_booking(
+    booking_id: int,
+    customer: Customer = Depends(get_current_customer),
+    db: Session = Depends(get_db)
+) -> Any:
+    """ Approve Artist booking """
+    booking = db.query(Booking).filter(
+        Booking.id == booking_id,
+        Booking.booking_type == BookingType.artist,
+        Booking.status == BookingStatus.pending,
+    ).first()
+
+    if not booking:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Booking not found"
+        )
+    if booking.customer_id != customer.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Booking does not belong to the customer"
+        )
+
+    pg_order_id = handle_artist_booking_payment_initiation(
+        booking=booking,
+        db=db
+    )
+
+    return {
+        "booking_id": booking.id,
+        "booking_uuid": booking.booking_uuid,
+        "pg_order_id": pg_order_id
+    }
 
 
 @router.post("/confirm/{booking_id}", response_class=CustomJSONResponse)

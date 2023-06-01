@@ -125,7 +125,7 @@ create table experience_slot
             references experience,
     start_time    timestamp with time zone               not null,
     end_time      timestamp with time zone               not null,
-    is_booked     boolean                  default false not null,
+    remaining_guest_limit     integer                    not null,
     is_active     boolean                  default true  not null,
     created_time  timestamp with time zone default now() not null,
     updated_time  timestamp with time zone default now() not null

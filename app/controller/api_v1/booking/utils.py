@@ -26,7 +26,6 @@ def validate_experience_booking(
 ) -> Experience:
     experience_slot: ExperienceSlot = db.query(ExperienceSlot).filter(
         ExperienceSlot.id == slot_id,
-        ExperienceSlot.is_booked.is_(False),
         ExperienceSlot.is_active.is_(True),
         ExperienceSlot.start_time >= datetime.now(tz=pytz.utc)
     ).first()
@@ -37,17 +36,13 @@ def validate_experience_booking(
             detail="No slot is available for booking"
         )
 
-    experience = db.query(Experience).filter(
-        Experience.id == experience_slot.experience_id,
-    ).first()
-
-    if no_of_guests > experience.guest_limit:
+    if no_of_guests > experience_slot.remaining_guest_limit:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No of guests exceeds guest limit"
         )
 
-    return experience
+    return experience_slot.experience
 
 
 def validate_artist_booking(
@@ -272,6 +267,25 @@ def handle_artist_booking_approval(
     )
 
 
+def handle_artist_booking_payment_initiation(
+    booking: Booking,
+    db: Session,
+) -> Any:
+    payment = db.query(Payment).filter(
+        Payment.booking_id == booking.id,
+        Payment.status == PaymentStatus.pending,
+    ).first()
+
+    if not payment:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Payment not found"
+        )
+
+    payment.pg_order_id = pg_utils.create_order()
+    return payment.pg_order_id
+
+
 def handle_booking_confirmation(
     booking: Booking,
     db: Session,
@@ -279,7 +293,7 @@ def handle_booking_confirmation(
     if booking.booking_type == BookingType.experience:
         experience_slot: ExperienceSlot = db.query(ExperienceSlot).filter(
             ExperienceSlot.id == booking.experience_slot_id,
-            ExperienceSlot.is_booked.is_(False),
+            ExperienceSlot.remaining_guest_limit >= booking.no_of_guests,
             ExperienceSlot.is_active.is_(True),
         ).with_for_update().first()
 
@@ -289,7 +303,7 @@ def handle_booking_confirmation(
                 detail="No slot is available for booking"
             )
 
-        experience_slot.is_booked = True
+        experience_slot.remaining_guest_limit -= booking.no_of_guests
     elif booking.booking_type == BookingType.artist:
         artist_slot: ArtistSlot = db.query(ArtistSlot).filter(
             ArtistSlot.id == booking.artist_slot_id,
