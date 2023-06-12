@@ -1,5 +1,12 @@
 ## Leisurebites Backend Application
 
+Guidelines to setup application:
+
+1. Download Postgres and Redis
+2. Create a database in postgres
+3. Run all .sql files from `sql_scripts` folder
+4. Create a .env file (see sample for help)
+
 Guidelines to run application:
 ```shell
 # Create Virtual Environment
