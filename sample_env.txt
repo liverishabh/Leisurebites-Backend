@@ -1,0 +1,10 @@
+# Sample File for .env
+SECRET_KEY=secret_key
+
+POSTGRES_SERVER=localhost
+POSTGRES_USER=user
+POSTGRES_PASSWORD=abc
+POSTGRES_DB=lb
+POSTGRES_PORT=5432
+
+# See for other values in app/config.py
