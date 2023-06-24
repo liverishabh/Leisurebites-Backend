@@ -33,6 +33,9 @@ class Supplier(BaseModel, UserMixin):
     gender = Column(Enum(SupplierGender))
     address = Column(TEXT)
     aadhar_number = Column(String(20))
+    profile_image = Column(String(255))
+    primary_category = Column(String(50))
+    starting_price = Column(INT)
     status = Column(Enum(SupplierStatus), server_default=SupplierStatus.created, nullable=False)
 
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)

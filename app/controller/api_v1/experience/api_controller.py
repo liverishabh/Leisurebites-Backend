@@ -1,11 +1,15 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Query
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Query, Body
 from sqlalchemy.orm import Session
 
 from app.config import config
-from app.controller.api_v1.experience.schema import ExperienceCreate, Experience as ExperienceResponse, \
-    ExperienceSlotAdd
+from app.controller.api_v1.experience.schema import (
+    ExperienceCreate,
+    Experience as ExperienceResponse,
+    ExperienceSlotAdd,
+    ExperienceFilter
+)
 from app.controller.api_v1.experience.utils import validate_new_slot
 from app.dependencies.db import get_db
 from app.models.supplier import Supplier
@@ -69,26 +73,47 @@ def get_experience_by_id(
 
 @router.post("/category/all", response_class=CustomJSONResponse)
 def get_experiences_by_category(
-
+    filter_request: Optional[ExperienceFilter] = Body(None),
     category_id: int = Query(...),
     db: Session = Depends(get_db),
 ) -> Any:
     """ Get all Experiences of a category """
-    experiences: List[Experience] = db.query(Experience).filter(
+    filers = [
         Experience.category_id == category_id,
         Experience.status == ExperienceStatus.approved
-    ).all()
+    ]
+    if filter_request:
+        if filter_request.min_price:
+            filers.append(Experience.price_per_guest >= filter_request.min_price)
+        if filter_request.max_price:
+            filers.append(Experience.price_per_guest <= filter_request.max_price)
+        if filter_request.venue_city:
+            filers.append(Experience.venue_city == filter_request.venue_city)
+    experiences: List[Experience] = db.query(Experience).filter(*filers).all()
 
+    experience_metadata = {
+        "all_venues": set(),
+        "min_price": 10000000,
+        "max_price": 0
+    }
     resp = []
     for experience in experiences:
         main_image_url = experience.images[0].url
         resp.append(ExperienceResponse(
             **experience.__dict__,
             experience_id=experience.id,
-            image_urls=[f"{config.S3_BUCKET_URL}/{main_image_url}"]
+            image_urls=[f"{config.S3_BUCKET_URL}/{main_image_url}"],
+            category=experience.category.name
         ))
+        experience_metadata["all_venues"].add(experience.venue_city)
+        experience_metadata["min_price"] = min(experience_metadata["min_price"], experience.price_per_guest)
+        experience_metadata["max_price"] = max(experience_metadata["max_price"], experience.price_per_guest)
 
-    return resp
+    # return resp
+    return {
+        "experiences": resp,
+        "metadata": experience_metadata
+    }
 
 
 @router.get("/host/all", response_class=CustomJSONResponse)

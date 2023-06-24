@@ -4,6 +4,7 @@ JWT_ENCODE_ALGORITHM = "HS256"
 
 PSWD_RESET_PREFIX = "PSWD_RESET_"
 
+PROFILE_IMAGE_DIR = "profile_images"
 EXPERIENCE_IMAGE_DIR = "experience_images"
 
 EMAIL_TEMPLATES_DIR = "app/resources/email_templates"

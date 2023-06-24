@@ -3,18 +3,25 @@ from typing import Optional, Any
 
 from pydantic import BaseModel, EmailStr, Field, validator
 
+from app.config import config
 from app.models.supplier import SupplierStatus, SupplierGender
 
 
 class Supplier(BaseModel):
     name: Optional[str]
     email_id: EmailStr
-    phone_no: str
-    alternate_phone_no: Optional[str]
+    # phone_no: str
+    # alternate_phone_no: Optional[str]
     description: Optional[str]
     gender: Optional[SupplierGender]
     address: Optional[str]
     status: SupplierStatus
+    profile_image: Optional[str]
+
+    @validator("profile_image")
+    @classmethod
+    def add_base_url(cls, v: Any) -> str:
+        return f"{config.S3_BUCKET_URL}/{v}"
 
 
 class SupplierUpdate(BaseModel):
@@ -24,6 +31,8 @@ class SupplierUpdate(BaseModel):
     gender: Optional[SupplierGender]
     address: Optional[str] = Field(None, min_length=1)
     aadhar_number: str = Field(..., min_length=1)
+    primary_category: Optional[str] = Field(None, min_length=1)
+    starting_price: Optional[int] = Field(None, gt=0)
 
     @validator("alternate_phone_no")
     @classmethod
@@ -33,3 +42,8 @@ class SupplierUpdate(BaseModel):
             raise ValueError("Alternate Phone Number is invalid")
 
         return v
+
+
+class Artist(Supplier):
+    category: Optional[str]
+    starting_price: Optional[int]

@@ -64,8 +64,9 @@ class ExperienceSlotAdd(BaseModel):
 
 
 class ExperienceFilter(BaseModel):
-    min_duration: int
-    max_duration: int
-    min_price: int
-    max_price: int
+    min_duration: Optional[int]
+    max_duration: Optional[int]
+    min_price: Optional[int]
+    max_price: Optional[int]
     venue_city: Optional[str]
+    language: Optional[str]
