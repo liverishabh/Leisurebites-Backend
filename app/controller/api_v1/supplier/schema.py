@@ -3,8 +3,8 @@ from typing import Optional, Any
 
 from pydantic import BaseModel, EmailStr, Field, validator
 
-from app.config import config
 from app.models.supplier import SupplierStatus, SupplierGender
+from app.utility.cloud_storage import cs_utils
 
 
 class Supplier(BaseModel):
@@ -21,7 +21,9 @@ class Supplier(BaseModel):
     @validator("profile_image")
     @classmethod
     def add_base_url(cls, v: Any) -> str:
-        return f"{config.S3_BUCKET_URL}/{v}"
+        if v:
+            return cs_utils.get_full_image_url(v)
+        return v
 
 
 class SupplierUpdate(BaseModel):

@@ -65,5 +65,9 @@ class CloudStorageUtils:
         else:
             return False, None
 
+    def get_full_image_url(self, cloud_file_path):
+        """ append bucket base url at beginning of url """
+        return f"{self.__cloud_storage_bucket_url}/{cloud_file_path}"
+
 
 cs_utils = CloudStorageUtils()

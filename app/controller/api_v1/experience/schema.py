@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from pydantic import BaseModel, Field, validator
 
 from app.models.experience import ExperienceMode
+from app.utility.cloud_storage import cs_utils
 
 
 class ExperienceSlot(BaseModel):
@@ -17,6 +18,9 @@ class ExperienceSlot(BaseModel):
 
 
 class Experience(BaseModel):
+    host_id: int
+    host_name: str
+    host_profile_image: Optional[str]
     experience_id: int
     category: str
     host_declaration: str
@@ -33,6 +37,13 @@ class Experience(BaseModel):
     venue_country: Optional[str]
     image_urls: List[str]
     slots: Optional[List[ExperienceSlot]]
+
+    @validator("host_profile_image")
+    @classmethod
+    def add_base_url(cls, v: Any) -> str:
+        if v:
+            return cs_utils.get_full_image_url(v)
+        return v
 
 
 class ExperienceCreate(BaseModel):

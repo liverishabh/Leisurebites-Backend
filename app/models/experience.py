@@ -73,6 +73,12 @@ class Experience(BaseModel):
                     "ExperienceImage.is_active == 'true')"
     )
 
+    host = relationship(
+        "Supplier", lazy="select",
+        primaryjoin="Supplier.id == Experience.host_id",
+        uselist=False
+    )
+
     category = relationship(
         "Category", lazy="select",
         primaryjoin="and_(Category.id == Experience.category_id, "
