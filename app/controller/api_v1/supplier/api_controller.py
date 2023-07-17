@@ -61,9 +61,21 @@ def register_supplier(
 
 @router.get("/profile", response_class=CustomJSONResponse)
 def get_supplier_profile(
-    supplier: Supplier = Depends(get_current_supplier)
+    supplier_id: int = Query(...),
+    db: Session = Depends(get_db),
 ) -> Any:
     """ Get Supplier Profile """
+    supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
+    if not supplier:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No supplier found"
+        )
+    if not supplier.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is inactive"
+        )
     return SupplierResponse(**supplier.__dict__)
 
 
