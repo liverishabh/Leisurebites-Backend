@@ -82,6 +82,15 @@ def get_experiences_by_category(
     db: Session = Depends(get_db),
 ) -> Any:
     """ Get all Experiences of a category """
+    category: Category = db.query(Category).filter(
+        Category.is_active.is_(True),
+        Category.id == category_id
+    ).first()
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Category with id {category_id} is inactive or does not exist"
+        )
     filers = [
         Experience.category_id == category_id,
         Experience.status == ExperienceStatus.approved
@@ -96,6 +105,12 @@ def get_experiences_by_category(
     experiences: List[Experience] = db.query(Experience).filter(*filers).all()
 
     experience_metadata = {
+        "category": {
+            "name": category.name,
+            "tag_line": category.tag_line,
+            "main_image_url": category.thumbnail_image_url,
+            "thumbnail_image_url": category.thumbnail_image_url,
+        },
         "all_venues": set(),
         "min_price": 10000000,
         "max_price": 0
@@ -110,7 +125,7 @@ def get_experiences_by_category(
             host_profile_image=host.profile_image,
             experience_id=experience.id,
             image_urls=[cs_utils.get_full_image_url(main_image_url)],
-            category=experience.category.name
+            category=category.name
         ))
         experience_metadata["all_venues"].add(experience.venue_city)
         experience_metadata["min_price"] = min(experience_metadata["min_price"], experience.price_per_guest)

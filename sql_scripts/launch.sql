@@ -58,14 +58,16 @@ create unique index ix_supplier_phone_no
 -- Category
 create table category
 (
-    id           serial
+    id                  serial
         constraint category_pkey
             primary key,
-    name         varchar(50)                            not null,
-    icon_image   varchar(255),
-    is_active    boolean                  default true  not null,
-    created_time timestamp with time zone default now() not null,
-    updated_time timestamp with time zone default now() not null
+    name                varchar(50)                            not null,
+    tag_line            varchar(255),
+    main_image_url      varchar(255),
+    thumbnail_image_url varchar(255),
+    is_active           boolean                  default true  not null,
+    created_time        timestamp with time zone default now() not null,
+    updated_time        timestamp with time zone default now() not null
 );
 
 
@@ -120,18 +122,18 @@ create table experience_image
 -- Experience Slot
 create table experience_slot
 (
-    id            bigserial
+    id                    bigserial
         constraint experience_slot_pkey
             primary key,
-    experience_id integer                                not null
+    experience_id         integer                                not null
         constraint experience_slot_experience_id_fkey
             references experience,
-    start_time    timestamp with time zone               not null,
-    end_time      timestamp with time zone               not null,
-    remaining_guest_limit     integer                    not null,
-    is_active     boolean                  default true  not null,
-    created_time  timestamp with time zone default now() not null,
-    updated_time  timestamp with time zone default now() not null
+    start_time            timestamp with time zone               not null,
+    end_time              timestamp with time zone               not null,
+    remaining_guest_limit integer                                not null,
+    is_active             boolean                  default true  not null,
+    created_time          timestamp with time zone default now() not null,
+    updated_time          timestamp with time zone default now() not null
 );
 
 
