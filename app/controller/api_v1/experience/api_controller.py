@@ -3,13 +3,13 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Query, Body
 from sqlalchemy.orm import Session
 
-from app.config import config
 from app.controller.api_v1.experience.schema import (
     ExperienceCreate,
     Experience as ExperienceResponse,
     ExperienceSlotAdd,
     ExperienceFilter
 )
+from app.controller.api_v1.category.schema import Category as CategoryResponse
 from app.controller.api_v1.experience.utils import validate_new_slot
 from app.dependencies.db import get_db
 from app.models.supplier import Supplier
@@ -105,12 +105,7 @@ def get_experiences_by_category(
     experiences: List[Experience] = db.query(Experience).filter(*filers).all()
 
     experience_metadata = {
-        "category": {
-            "name": category.name,
-            "tag_line": category.tag_line,
-            "main_image_url": category.thumbnail_image_url,
-            "thumbnail_image_url": category.thumbnail_image_url,
-        },
+        "category": CategoryResponse(**category.__dict__),
         "all_venues": set(),
         "min_price": 10000000,
         "max_price": 0
