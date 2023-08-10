@@ -112,14 +112,16 @@ def get_experiences_by_category(
     }
     resp = []
     for experience in experiences:
-        main_image_url = experience.images[0].url
+        image_urls = []
+        for image in experience.images:
+            image_urls.append(cs_utils.get_full_image_url(image.url))
         host = experience.host
         resp.append(ExperienceResponse(
             **experience.__dict__,
             host_name=host.name,
             host_profile_image=host.profile_image,
             experience_id=experience.id,
-            image_urls=[cs_utils.get_full_image_url(main_image_url)],
+            image_urls=image_urls,
             category=category.name
         ))
         experience_metadata["all_venues"].add(experience.venue_city)
@@ -145,11 +147,16 @@ def get_all_experiences_of_host(
 
     resp = []
     for experience in experiences:
-        main_image_url = experience.images[0].url
+        image_urls = []
+        for image in experience.images:
+            image_urls.append(cs_utils.get_full_image_url(image.url))
+        host = experience.host
         resp.append(ExperienceResponse(
             **experience.__dict__,
+            host_name=host.name,
+            host_profile_image=host.profile_image,
             experience_id=experience.id,
-            image_urls=[cs_utils.get_full_image_url(main_image_url)],
+            image_urls=image_urls,
             category=experience.category.name
         ))
 

@@ -19,7 +19,7 @@ class ExperienceSlot(BaseModel):
 
 class Experience(BaseModel):
     host_id: int
-    host_name: str
+    host_name: Optional[str]
     host_profile_image: Optional[str]
     experience_id: int
     category: str
