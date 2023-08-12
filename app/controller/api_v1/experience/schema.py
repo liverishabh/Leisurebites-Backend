@@ -11,7 +11,7 @@ class ExperienceSlot(BaseModel):
     id: int
     start_time: datetime
     end_time: datetime
-    is_booked: bool
+    remaining_guest_limit: int
 
     class Config:
         orm_mode = True
