@@ -6,7 +6,6 @@ from app.models.user import UserMixin
 
 
 class Customer(BaseModel, UserMixin):
-    id = Column(BIGINT, primary_key=True, autoincrement=True, nullable=False)
 
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
     updated_time = Column(DateTime(timezone=True), server_default=text("NOW()"), onupdate=text("NOW()"), nullable=False)

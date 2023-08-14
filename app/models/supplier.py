@@ -26,7 +26,6 @@ class SupplierGender(str, enum.Enum):
 
 
 class Supplier(BaseModel, UserMixin):
-    id = Column(INT, primary_key=True, autoincrement=True, nullable=False)
     type = Column(Enum(SupplierType), nullable=False)
     description = Column(TEXT)
     alternate_phone_no = Column(String(20))

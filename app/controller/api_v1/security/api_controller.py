@@ -65,11 +65,14 @@ def login_access_token(
         )
 
     claims = {
+        "id": user.id,
         "username": form_data.username,
         "email_id": user.email_id,
         "phone_no": user.phone_no,
         "user_type": user_type.value
     }
+    if user_type == UserType.supplier:
+        claims["status"] = user.status
     token = get_token(claims)
     token["token_type"] = "bearer"
 

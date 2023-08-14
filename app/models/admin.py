@@ -12,7 +12,6 @@ class AdminRoles(str, enum.Enum):
 
 
 class Admin(BaseModel, UserMixin):
-    id = Column(INT, primary_key=True, autoincrement=True, nullable=False)
     role = Column(Enum(AdminRoles))
 
     created_time = Column(DateTime(timezone=True), server_default=text("NOW()"), nullable=False)
