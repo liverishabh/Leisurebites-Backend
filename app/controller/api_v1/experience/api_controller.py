@@ -137,10 +137,16 @@ def get_experiences_by_category(
 
 @router.get("/host/all", response_class=CustomJSONResponse)
 def get_all_experiences_of_host(
-    supplier: Supplier = Depends(get_current_supplier),
+    host_id: int = Query(...),
     db: Session = Depends(get_db),
 ) -> Any:
     """ Get all experiences of a host """
+    supplier = db.query(Supplier).filter(Supplier.id == host_id).first()
+    if not supplier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No host found"
+        )
     experiences: List[Experience] = db.query(Experience).filter(
         Experience.host_id == supplier.id
     ).all()

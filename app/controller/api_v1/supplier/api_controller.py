@@ -68,7 +68,7 @@ def get_supplier_profile(
     supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
     if not supplier:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="No supplier found"
         )
     if not supplier.is_active:
