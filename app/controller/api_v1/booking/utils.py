@@ -23,7 +23,7 @@ def validate_experience_booking(
     slot_id: int,
     no_of_guests: int,
     db: Session
-) -> Experience:
+) -> ExperienceSlot:
     experience_slot: ExperienceSlot = db.query(ExperienceSlot).filter(
         ExperienceSlot.id == slot_id,
         ExperienceSlot.is_active.is_(True),
@@ -39,10 +39,10 @@ def validate_experience_booking(
     if no_of_guests > experience_slot.remaining_guest_limit:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No of guests exceeds guest limit"
+            detail="No of guests exceeds remaining guest limit"
         )
 
-    return experience_slot.experience
+    return experience_slot
 
 
 def validate_artist_booking(
@@ -163,13 +163,14 @@ def get_booking_row(
 
 def get_payment_row(
     booking: Booking,
+    payment_method: PaymentMethod
 ) -> Payment:
     payment = Payment()
     payment.booking_id = booking.id
     payment.amount = booking.payable_amount
     payment.status = PaymentStatus.pending
     payment.transaction_code = ShortUUID().random(length=24)
-    payment.payment_method = PaymentMethod.pg
+    payment.payment_method = payment_method
 
     return payment
 
@@ -177,6 +178,7 @@ def get_payment_row(
 def initiate_experience_booking(
     experience: Experience,
     customer_id: int,
+    payment_method: PaymentMethod,
     slot_id: int,
     no_of_guests: int,
     promo_code: Optional[str],
@@ -201,8 +203,9 @@ def initiate_experience_booking(
     db.flush()
     db.refresh(booking)
 
-    payment = get_payment_row(booking)
-    payment.pg_order_id = pg_utils.create_order()
+    payment = get_payment_row(booking, payment_method)
+    if payment_method == PaymentMethod.pg:
+        payment.pg_order_id = pg_utils.create_order()
 
     db.add(payment)
 
@@ -214,6 +217,7 @@ def initiate_experience_booking(
 def initiate_artist_booking(
     artist_slot: ArtistSlot,
     customer_id: int,
+    payment_method: PaymentMethod,
     no_of_guests: int,
     promo_code: Optional[str],
     db: Session,
@@ -238,7 +242,7 @@ def initiate_artist_booking(
     db.flush()
     db.refresh(booking)
 
-    payment = get_payment_row(booking)
+    payment = get_payment_row(booking, payment_method)
 
     db.add(payment)
 
@@ -282,7 +286,8 @@ def handle_artist_booking_payment_initiation(
             detail="Payment not found"
         )
 
-    payment.pg_order_id = pg_utils.create_order()
+    if payment.payment_method == PaymentMethod.pg:
+        payment.pg_order_id = pg_utils.create_order()
     return payment.pg_order_id
 
 
@@ -328,7 +333,7 @@ def handle_booking_confirmation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Payment not found"
         )
-    if not pg_utils.verify_payment(payment.pg_order_id):
+    if payment.payment_method == PaymentMethod.pg and not pg_utils.verify_payment(payment.pg_order_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Payment verification failed"

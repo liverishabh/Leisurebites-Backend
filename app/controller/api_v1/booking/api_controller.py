@@ -3,7 +3,13 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.controller.api_v1.booking.schema import BookingCreate
+from app.controller.api_v1.booking.schema import (
+    BookingCreate,
+    CheckoutDetails,
+    CheckoutRequest,
+    CheckoutResponse,
+    Venue
+)
 from app.controller.api_v1.booking.utils import (
     validate_experience_booking,
     initiate_experience_booking,
@@ -12,7 +18,7 @@ from app.controller.api_v1.booking.utils import (
     update_artist_slot_address,
     handle_booking_confirmation,
     handle_artist_booking_approval,
-    handle_artist_booking_payment_initiation
+    handle_artist_booking_payment_initiation, get_checkout_details
 )
 from app.dependencies.db import get_db
 from app.models.booking import Booking, BookingType, BookingStatus
@@ -25,6 +31,61 @@ from app.utility.router import RequestResponseLoggingRoute
 router = APIRouter(route_class=RequestResponseLoggingRoute)
 
 
+@router.post("/checkout", response_class=CustomJSONResponse)
+def checkout_booking(
+    checkout_request: CheckoutRequest,
+    customer: Customer = Depends(get_current_customer),
+    db: Session = Depends(get_db)
+) -> Any:
+    resp = None
+    if checkout_request.booking_type == BookingType.experience:
+        experience_slot = validate_experience_booking(
+            slot_id=checkout_request.slot_id,
+            no_of_guests=checkout_request.no_of_guests,
+            db=db
+        )
+        experience = experience_slot.experience
+        checkout_details: CheckoutDetails = get_checkout_details(
+            total_order_amount=float(experience.price_per_guest) * checkout_request.no_of_guests,
+            promo_code=checkout_request.promo_code,
+            db=db,
+        )
+        resp = CheckoutResponse(
+            **checkout_details.dict(),
+            title=experience.title,
+            slot_start_time=experience_slot.start_time,
+            slot_end_time=experience_slot.end_time,
+            no_of_guests=checkout_request.no_of_guests,
+            venue=Venue(
+                address=experience.venue_address,
+                city=experience.venue_city,
+                state=experience.venue_state,
+                country=experience.venue_country,
+            )
+        )
+
+    elif checkout_request.booking_type == BookingType.artist:
+        artist_slot = validate_artist_booking(
+            slot_id=checkout_request.slot_id,
+            db=db
+        )
+        checkout_details: CheckoutDetails = get_checkout_details(
+            total_order_amount=float(artist_slot.price),
+            promo_code=checkout_request.promo_code,
+            db=db,
+        )
+        resp = CheckoutResponse(
+            **checkout_details.dict(),
+            title=artist_slot.artist.name,
+            slot_start_time=artist_slot.start_time,
+            slot_end_time=artist_slot.end_time,
+            no_of_guests=checkout_request.no_of_guests,
+            venue=checkout_request.venue
+        )
+
+    return resp
+
+
 @router.post("/initiate", response_class=CustomJSONResponse)
 def initiate_booking(
     create_booking_request: BookingCreate,
@@ -34,14 +95,15 @@ def initiate_booking(
     """ Initiate booking """
     booking, pg_order_id = None, None
     if create_booking_request.booking_type == BookingType.experience:
-        experience = validate_experience_booking(
+        experience_slot = validate_experience_booking(
             slot_id=create_booking_request.slot_id,
             no_of_guests=create_booking_request.no_of_guests,
             db=db
         )
         booking, pg_order_id = initiate_experience_booking(
-            experience=experience,
+            experience=experience_slot.experience,
             customer_id=customer.id,
+            payment_method=create_booking_request.payment_method,
             slot_id=create_booking_request.slot_id,
             no_of_guests=create_booking_request.no_of_guests,
             promo_code=create_booking_request.promo_code,
@@ -60,6 +122,7 @@ def initiate_booking(
         booking = initiate_artist_booking(
             artist_slot=artist_slot,
             customer_id=customer.id,
+            payment_method=create_booking_request.payment_method,
             no_of_guests=create_booking_request.no_of_guests,
             promo_code=create_booking_request.promo_code,
             db=db
@@ -169,4 +232,7 @@ def confirm_booking(
         db=db
     )
 
-    return "Booking Confirmed"
+    return {
+        "booking_amount": booking.payable_amount,
+        "message": "Booking Confirmed"
+    }

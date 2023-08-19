@@ -1,8 +1,10 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
 
 from app.models.booking import BookingType
+from app.models.payment import PaymentMethod
 
 
 class CheckoutDetails(BaseModel):
@@ -23,7 +25,24 @@ class Venue(BaseModel):
 
 class BookingCreate(BaseModel):
     booking_type: BookingType
+    payment_method: PaymentMethod
     slot_id: int
     no_of_guests: int
     promo_code: Optional[str]
+    venue: Optional[Venue]
+
+
+class CheckoutRequest(BaseModel):
+    booking_type: BookingType
+    slot_id: int
+    no_of_guests: int
+    promo_code: Optional[str]
+    venue: Optional[Venue]
+
+
+class CheckoutResponse(CheckoutDetails):
+    title: str
+    slot_start_time: datetime
+    slot_end_time: datetime
+    no_of_guests: int
     venue: Optional[Venue]
