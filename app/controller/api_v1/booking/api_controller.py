@@ -53,6 +53,7 @@ def checkout_booking(
         resp = CheckoutResponse(
             **checkout_details.dict(),
             title=experience.title,
+            slot_id=checkout_request.slot_id,
             slot_start_time=experience_slot.start_time,
             slot_end_time=experience_slot.end_time,
             no_of_guests=checkout_request.no_of_guests,
@@ -77,6 +78,7 @@ def checkout_booking(
         resp = CheckoutResponse(
             **checkout_details.dict(),
             title=artist_slot.artist.name,
+            slot_id=checkout_request.slot_id,
             slot_start_time=artist_slot.start_time,
             slot_end_time=artist_slot.end_time,
             no_of_guests=checkout_request.no_of_guests,

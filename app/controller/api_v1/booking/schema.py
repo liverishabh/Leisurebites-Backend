@@ -42,6 +42,7 @@ class CheckoutRequest(BaseModel):
 
 class CheckoutResponse(CheckoutDetails):
     title: str
+    slot_id: int
     slot_start_time: datetime
     slot_end_time: datetime
     no_of_guests: int
