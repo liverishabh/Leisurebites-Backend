@@ -73,6 +73,7 @@ def login_access_token(
     }
     if user_type == UserType.supplier:
         claims["status"] = user.status
+        claims["supplier_type"] = user.type
     token = get_token(claims)
     token["token_type"] = "bearer"
 

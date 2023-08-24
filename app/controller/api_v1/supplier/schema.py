@@ -8,6 +8,7 @@ from app.utility.cloud_storage import cs_utils
 
 
 class Supplier(BaseModel):
+    id: int
     name: Optional[str]
     email_id: EmailStr
     # phone_no: str

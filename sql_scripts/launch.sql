@@ -56,11 +56,13 @@ create unique index ix_supplier_phone_no
 
 
 -- Category
+create type categorytype as enum ('experience', 'artist');
 create table category
 (
     id                  serial
         constraint category_pkey
             primary key,
+    type                categorytype                           not null,
     name                varchar(50)                            not null,
     tag_line            varchar(255),
     main_image_url      varchar(255),
