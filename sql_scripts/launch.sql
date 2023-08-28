@@ -34,6 +34,7 @@ create table supplier
     alternate_phone_no varchar(20),
     gender             suppliergender,
     address            text,
+    language           varchar(255),
     aadhar_number      varchar(20),
     profile_image      varchar(255),
     primary_category   varchar(50),

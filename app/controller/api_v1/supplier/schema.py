@@ -16,6 +16,7 @@ class Supplier(BaseModel):
     description: Optional[str]
     gender: Optional[SupplierGender]
     address: Optional[str]
+    language: Optional[str]
     status: SupplierStatus
     profile_image: Optional[str]
 
@@ -33,6 +34,7 @@ class SupplierUpdate(BaseModel):
     alternate_phone_no: Optional[str] = Field(None, min_length=1)
     gender: Optional[SupplierGender]
     address: Optional[str] = Field(None, min_length=1)
+    language: Optional[str] = Field(None, min_length=1)
     aadhar_number: str = Field(..., min_length=1)
     primary_category: Optional[str] = Field(None, min_length=1)
     starting_price: Optional[int] = Field(None, gt=0)

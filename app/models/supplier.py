@@ -31,6 +31,7 @@ class Supplier(BaseModel, UserMixin):
     alternate_phone_no = Column(String(20))
     gender = Column(Enum(SupplierGender))
     address = Column(TEXT)
+    language = Column(String(255))
     aadhar_number = Column(String(20))
     profile_image = Column(String(255))
     primary_category = Column(String(50))
