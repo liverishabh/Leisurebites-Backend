@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.controller.api_v1.security.utils import get_password_hash
 from app.controller.api_v1.supplier.schema import (
     Supplier as SupplierResponse,
+    SupplierComplete as SupplierCompleteResponse,
     SupplierUpdate,
     Artist as ArtistResponse
 )
@@ -77,6 +78,19 @@ def get_supplier_profile(
             detail="User is inactive"
         )
     return SupplierResponse(**supplier.__dict__)
+
+
+@router.get("/my-profile", response_class=CustomJSONResponse)
+def get_supplier_profile(
+    supplier: Supplier = Depends(get_current_supplier),
+) -> Any:
+    """ Get Complete Supplier Profile (token needed) """
+    if not supplier.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is inactive"
+        )
+    return SupplierCompleteResponse(**supplier.__dict__)
 
 
 @router.post("/profile", response_class=CustomJSONResponse)

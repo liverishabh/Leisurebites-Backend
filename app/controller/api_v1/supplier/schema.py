@@ -11,13 +11,16 @@ class Supplier(BaseModel):
     id: int
     name: Optional[str]
     email_id: EmailStr
-    # phone_no: str
-    # alternate_phone_no: Optional[str]
     description: Optional[str]
     gender: Optional[SupplierGender]
     address: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    country: Optional[str]
     language: Optional[str]
     status: SupplierStatus
+    primary_category: Optional[str]
+    starting_price: Optional[int]
     profile_image: Optional[str]
 
     @validator("profile_image")
@@ -28,14 +31,23 @@ class Supplier(BaseModel):
         return v
 
 
+class SupplierComplete(Supplier):
+    phone_no: str
+    alternate_phone_no: Optional[str]
+    aadhar_number: Optional[str]
+
+
 class SupplierUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = Field(None, min_length=1)
     alternate_phone_no: Optional[str] = Field(None, min_length=1)
     gender: Optional[SupplierGender]
     address: Optional[str] = Field(None, min_length=1)
+    city: Optional[str] = Field(None, min_length=1)
+    state: Optional[str] = Field(None, min_length=1)
+    country: Optional[str] = Field(None, min_length=1)
     language: Optional[str] = Field(None, min_length=1)
-    aadhar_number: str = Field(..., min_length=1)
+    aadhar_number: Optional[str] = Field(None, min_length=1)
     primary_category: Optional[str] = Field(None, min_length=1)
     starting_price: Optional[int] = Field(None, gt=0)
 
